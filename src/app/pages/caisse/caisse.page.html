@@ -1,0 +1,112 @@
+<ion-content [fullscreen]="true" [scrollY]="false" class="bg-slate-50">
+  
+  <div class="fixed inset-0 w-full h-screen grid grid-cols-1 md:grid-cols-[1fr_420px] bg-slate-50">
+    
+    <div class="flex flex-col h-full overflow-hidden border-r border-slate-200 relative">
+      
+      <div class="px-4 py-3 bg-white border-b border-slate-100 flex justify-between items-center shrink-0 h-16 z-20 shadow-sm">
+        <div class="flex items-center gap-3">
+          
+          <ion-menu-button auto-hide="false" class="h-10 w-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-600 tap-effect hover:bg-slate-100 transition-colors border border-transparent hover:border-slate-200 focus:outline-none">
+            <ion-icon name="menu-outline" class="text-xl"></ion-icon>
+          </ion-menu-button>
+          
+          <div class="relative flex items-center bg-white rounded-full pl-1 pr-3 h-11 border border-slate-200 shadow-sm tap-effect group cursor-pointer transition-all hover:border-indigo-300 hover:shadow-md max-w-[220px]">
+             <div class="relative h-8 w-8 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center shrink-0 border border-indigo-100 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+               <ion-icon name="person" class="text-sm"></ion-icon>
+               <div class="absolute bottom-0 right-0 h-2.5 w-2.5 bg-emerald-400 border-2 border-white rounded-full"></div>
+             </div>
+             <ion-select [(ngModel)]="currentStaffId" [interfaceOptions]="customPopoverOptions" interface="popover" (ionChange)="updateCurrentStaffName()" class="custom-select pl-2 text-sm max-w-[140px]" placeholder="Choisir">
+               <ion-select-option value="COMPTOIR">Comptoir</ion-select-option>
+               <ng-container *ngFor="let s of staffList$ | async">
+                 <ion-select-option [value]="s.id">{{ s.name }}</ion-select-option>
+               </ng-container>
+             </ion-select>
+             <ion-icon name="chevron-down-outline" class="text-slate-300 text-xs ml-auto group-hover:text-indigo-500 group-hover:rotate-180 transition-transform duration-300"></ion-icon>
+          </div>
+        </div>
+        
+        <button (click)="openScanner()" class="bg-slate-800 text-white px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-bold shadow-lg shadow-slate-300 tap-effect active:scale-95 transition-transform hover:bg-slate-700">
+          <ion-icon name="scan-outline" class="text-lg"></ion-icon>
+          <span class="hidden sm:inline">Scanner</span>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-4 pb-[60vh] md:pb-4 bg-slate-50">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          <ng-container *ngFor="let product of products$ | async">
+            <div (click)="addToCart(product)"
+                 class="bg-white rounded-2xl p-2 shadow-sm border border-slate-100 group tap-effect cursor-pointer flex flex-col h-48 active:scale-95 transition-transform hover:shadow-md">
+              <div class="h-28 w-full bg-slate-50 rounded-xl overflow-hidden relative mb-2">
+                 <img [src]="product.imageUrl" class="h-full w-full object-cover" loading="lazy" />
+                 <div class="absolute bottom-1 right-1 bg-white/90 backdrop-blur px-2 py-0.5 rounded-md text-[10px] font-bold text-slate-900 shadow-sm">
+                   {{ product.price | currency:'EUR':'symbol':'1.2-2' }}
+                 </div>
+              </div>
+              <div class="flex-1 flex flex-col px-1">
+                 <h3 class="font-bold text-slate-700 text-xs leading-tight line-clamp-2 group-hover:text-indigo-600 transition-colors">{{ product.name }}</h3>
+                 <p class="text-[9px] text-slate-400 font-bold uppercase mt-auto">{{ product.category }}</p>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white z-[500] 
+                fixed bottom-0 w-full h-[60vh] rounded-t-[2rem] shadow-[0_-10px_40px_rgba(0,0,0,0.1)]
+                md:relative md:w-auto md:h-full md:rounded-none md:shadow-none md:border-l md:border-slate-200
+                grid grid-rows-[auto_1fr_auto]"> 
+      
+      <div class="px-6 py-3 flex justify-between items-center border-b border-dashed border-slate-200 bg-white h-16 rounded-t-[2rem] md:rounded-none z-10">
+        <div class="flex items-center gap-2">
+          <div class="bg-indigo-50 p-2 rounded-lg text-indigo-600">
+            <ion-icon name="cart-outline" class="text-xl"></ion-icon>
+          </div>
+          <span class="font-bold text-slate-800">Panier</span>
+        </div>
+        <div class="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-bold">
+          <ng-container *ngIf="cart$ | async as cart">{{ cart.itemCount }} items</ng-container>
+        </div>
+      </div>
+
+      <div class="overflow-y-auto p-4 space-y-3 bg-slate-50/50 relative">
+        <ng-container *ngIf="cart$ | async as cart">
+          <div *ngIf="cart.items.length === 0" class="absolute inset-0 flex flex-col items-center justify-center text-slate-300 gap-3">
+            <ion-icon name="basket-outline" class="text-5xl opacity-40"></ion-icon>
+            <p class="text-sm font-medium">Panier vide</p>
+          </div>
+          <div *ngFor="let item of cart.items" class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex items-center justify-between">
+            <div class="flex-1 min-w-0 mr-3">
+              <h4 class="font-bold text-slate-700 text-sm truncate">{{ item.product.name }}</h4>
+              <div class="text-xs text-indigo-600 font-bold mt-0.5">
+                {{ item.product.price | currency:'EUR' }} 
+                <span class="text-slate-400 font-normal">x {{ item.quantity }}</span>
+              </div>
+            </div>
+            <div class="flex items-center bg-slate-50 rounded-lg h-8 border border-slate-200">
+              <button (click)="decreaseItem(item.product.id!)" class="w-8 h-full flex items-center justify-center text-slate-500 hover:bg-white rounded-l-lg tap-effect"><ion-icon name="remove-outline"></ion-icon></button>
+              <span class="w-6 text-center text-xs font-bold text-slate-800">{{ item.quantity }}</span>
+              <button (click)="addToCart(item.product)" class="w-8 h-full flex items-center justify-center text-slate-500 hover:bg-white rounded-r-lg tap-effect"><ion-icon name="add-outline"></ion-icon></button>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <div class="bg-white border-t border-slate-100 p-5 pb-safe z-20 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
+        <ng-container *ngIf="cart$ | async as cart">
+          <div class="flex justify-between items-end mb-3">
+            <div class="flex flex-col">
+              <span class="text-xs text-slate-400 font-bold uppercase">Total TTC</span>
+            </div>
+            <span class="text-3xl font-extrabold text-slate-900 tracking-tight">{{ cart.total | currency:'EUR':'symbol':'1.2-2' }}</span>
+          </div>
+          <button (click)="validateSale()" [disabled]="cart.items.length === 0 || isProcessing" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold shadow-xl shadow-indigo-200 flex items-center justify-center gap-3 tap-effect disabled:opacity-50 disabled:shadow-none transition-all hover:bg-indigo-700 active:scale-95">
+            <span *ngIf="!isProcessing" class="flex items-center gap-2">VALIDER <ion-icon name="checkmark-circle-outline" class="text-xl"></ion-icon></span>
+            <span *ngIf="isProcessing">Traitement...</span>
+          </button>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</ion-content>

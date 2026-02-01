@@ -1,0 +1,7 @@
+{
+  "name": "IonicCaisse",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

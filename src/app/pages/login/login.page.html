@@ -1,0 +1,44 @@
+<ion-content class="bg-slate-50">
+  <div class="flex flex-col items-center justify-center min-h-screen p-6">
+    
+    <div class="w-full max-w-sm">
+      <div class="flex justify-center mb-8">
+        <div class="h-20 w-20 bg-indigo-600 rounded-3xl flex items-center justify-center shadow-xl shadow-indigo-200">
+          <ion-icon name="storefront" class="text-4xl text-white"></ion-icon>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl shadow-lg border border-slate-100 p-8">
+        <h1 class="text-2xl font-extrabold text-center text-slate-800 mb-2">Bienvenue</h1>
+        <p class="text-center text-slate-400 text-sm mb-8">Connectez-vous pour accéder à la caisse</p>
+
+        <form (submit)="onLogin($event)" class="flex flex-col gap-4">
+          
+          <div class="bg-slate-50 rounded-xl px-4 py-2 border border-slate-200 focus-within:border-indigo-500 focus-within:ring-2 ring-indigo-100 transition-all">
+            <label class="text-xs font-bold text-slate-400 uppercase">Email</label>
+            <input [(ngModel)]="email" name="email" type="email" placeholder="admin@example.com" class="w-full bg-transparent outline-none font-bold text-slate-700 h-8">
+          </div>
+
+          <div class="bg-slate-50 rounded-xl px-4 py-2 border border-slate-200 focus-within:border-indigo-500 focus-within:ring-2 ring-indigo-100 transition-all">
+            <label class="text-xs font-bold text-slate-400 uppercase">Mot de passe</label>
+            <input [(ngModel)]="password" name="password" type="password" placeholder="••••••••" class="w-full bg-transparent outline-none font-bold text-slate-700 h-8">
+          </div>
+
+          <div *ngIf="errorMessage" class="bg-red-50 text-red-600 text-xs font-bold p-3 rounded-xl flex items-center gap-2">
+            <ion-icon name="alert-circle"></ion-icon>
+            {{ errorMessage }}
+          </div>
+
+          <button type="submit" [disabled]="isLoading" class="mt-4 w-full bg-indigo-600 text-white h-12 rounded-xl font-bold shadow-lg shadow-indigo-200 tap-effect active:scale-95 transition-transform flex items-center justify-center gap-2 disabled:opacity-50">
+            <span *ngIf="!isLoading">SE CONNECTER</span>
+            <ion-spinner *ngIf="isLoading" color="light"></ion-spinner>
+          </button>
+
+        </form>
+      </div>
+      
+      <p class="text-center text-slate-400 text-xs mt-8">© 2026 App Caisse</p>
+    </div>
+
+  </div>
+</ion-content>

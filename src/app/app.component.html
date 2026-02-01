@@ -1,0 +1,47 @@
+<ion-app>
+  <ion-menu contentId="main-content" type="overlay" class="my-custom-menu">
+    
+    <div class="bg-indigo-600 p-6 flex flex-col justify-end h-40 relative overflow-hidden">
+      <div class="absolute -top-10 -right-10 w-40 h-40 bg-white opacity-10 rounded-full"></div>
+      
+      <div class="flex items-center gap-3 z-10">
+        <div class="h-12 w-12 bg-white rounded-2xl flex items-center justify-center text-indigo-600 shadow-md">
+          <ion-icon name="storefront" class="text-2xl"></ion-icon>
+        </div>
+        <div>
+          <h2 class="text-white font-extrabold text-lg tracking-tight">Ma Boutique</h2>
+          <p class="text-indigo-200 text-xs font-mono">{{ authService.getCurrentUserEmail() || 'Non connecté' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <ion-content class="bg-slate-50" style="--background: #f8fafc;">
+      <div class="py-4 px-3 flex flex-col h-full">
+        
+        <ion-list class="bg-transparent space-y-1">
+          <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages">
+            <div [routerLink]="p.url" routerLinkActive="bg-indigo-50 text-indigo-600" class="group flex items-center p-3 rounded-xl transition-colors cursor-pointer hover:bg-slate-100 text-slate-600">
+              <div class="h-8 w-8 rounded-lg flex items-center justify-center mr-3 bg-white text-slate-400 border border-slate-100 group-[.text-indigo-600]:bg-indigo-100 group-[.text-indigo-600]:text-indigo-600 group-[.text-indigo-600]:border-indigo-100 transition-colors">
+                <ion-icon [name]="p.icon" class="text-lg"></ion-icon>
+              </div>
+              <span class="font-bold text-sm flex-1">{{ p.title }}</span>
+              <ion-icon name="chevron-forward-outline" class="text-slate-300 text-xs opacity-0 group-[.text-indigo-600]:opacity-100"></ion-icon>
+            </div>
+          </ion-menu-toggle>
+        </ion-list>
+
+        <div class="mt-auto border-t border-slate-200 pt-4">
+          <ion-menu-toggle auto-hide="false">
+            <button (click)="logout()" class="w-full flex items-center p-3 rounded-xl text-red-500 hover:bg-red-50 transition-colors gap-3">
+              <ion-icon name="log-out-outline" class="text-xl"></ion-icon>
+              <span class="font-bold text-sm">Déconnexion</span>
+            </button>
+          </ion-menu-toggle>
+        </div>
+
+      </div>
+    </ion-content>
+  </ion-menu>
+
+  <ion-router-outlet id="main-content"></ion-router-outlet>
+</ion-app>

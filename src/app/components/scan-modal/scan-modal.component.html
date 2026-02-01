@@ -1,0 +1,27 @@
+<ion-content class="bg-black relative">
+  
+  <div class="absolute top-4 right-4 z-50">
+    <ion-button (click)="close()" color="light" shape="round" class="opacity-80">
+      <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+    </ion-button>
+  </div>
+
+  <div class="flex flex-col h-full justify-center items-center bg-black">
+    <h2 class="text-white mb-8 font-bold text-lg">Scanner un produit</h2>
+    
+    <div class="w-full relative">
+        <zxing-scanner
+            [formats]="allowedFormats"
+            (scanSuccess)="handleQrCodeResult($event)">
+        </zxing-scanner>
+        
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div class="w-3/4 h-0.5 bg-red-500 shadow-[0_0_15px_rgba(239,68,68,1)]"></div>
+        </div>
+    </div>
+
+    <p class="text-gray-400 mt-8 text-center px-4 text-sm">
+      Placez le code-barres dans le cadre
+    </p>
+  </div>
+</ion-content>

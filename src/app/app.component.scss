@@ -1,0 +1,16 @@
+ion-list {
+  background: transparent !important;
+  padding: 0;
+}
+ion-item {
+  --background: transparent;
+  --min-height: 48px;
+}
+ion-menu::part(backdrop) {
+  background-color: rgba(30, 41, 59, 0.5); /* Slate-800 avec opacité */
+  backdrop-filter: blur(2px);
+}
+ion-menu::part(container) {
+  border-radius: 0 24px 24px 0; /* Arrondi du menu à droite */
+  box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+}

@@ -1,0 +1,118 @@
+<ion-content [fullscreen]="true" [scrollY]="false" class="bg-slate-50">
+  <div class="absolute inset-0 flex flex-col w-full h-full overflow-hidden">
+    
+    <div class="bg-white border-b border-slate-100 flex flex-col shrink-0 z-20 shadow-sm">
+      <div class="px-5 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <ion-menu-button auto-hide="false" class="h-10 w-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-600 tap-effect hover:bg-slate-100 transition-colors focus:outline-none">
+            <ion-icon name="menu-outline" class="text-xl"></ion-icon>
+          </ion-menu-button>
+          <h1 class="font-bold text-lg text-slate-800">Historique</h1>
+        </div>
+      </div>
+
+      <div class="px-5 pb-4 flex flex-col gap-3">
+        
+        <ion-segment [value]="paymentFilter$ | async" (ionChange)="onPaymentChange($event)" mode="ios" class="h-8">
+          <ion-segment-button value="ALL"><ion-label class="text-xs font-bold">Tout</ion-label></ion-segment-button>
+          <ion-segment-button value="ESPECES"><ion-label class="text-xs font-bold">Espèces</ion-label></ion-segment-button>
+          <ion-segment-button value="CARTE"><ion-label class="text-xs font-bold">Carte</ion-label></ion-segment-button>
+        </ion-segment>
+
+        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+          
+          <div class="relative flex items-center bg-slate-100 rounded-full pl-2 pr-2 h-8 border border-slate-200 shrink-0">
+             <ion-icon name="person-outline" class="text-slate-500 text-xs mr-1"></ion-icon>
+             <ion-select [interfaceOptions]="customPopoverOptions" 
+                         interface="popover" 
+                         (ionChange)="onStaffChange($event)" 
+                         value="ALL"
+                         class="text-xs font-bold text-slate-700 min-w-[60px] max-w-[100px]" 
+                         style="--padding-start:0; --padding-end:0;">
+               <ion-select-option value="ALL">Tous</ion-select-option>
+               <ion-select-option value="COMPTOIR">Comptoir</ion-select-option>
+               <ng-container *ngFor="let s of staffList$ | async">
+                 <ion-select-option [value]="s.id">{{ s.name }}</ion-select-option>
+               </ng-container>
+             </ion-select>
+             <ion-icon name="chevron-down-outline" class="text-slate-400 text-[10px] ml-1"></ion-icon>
+          </div>
+
+          <div class="w-px h-6 bg-slate-200 mx-1 shrink-0"></div>
+
+          <button (click)="setRange('today')" [class]="currentRange === 'today' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'bg-slate-100 text-slate-600 border border-slate-200'" class="px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all tap-effect">Auj.</button>
+          <button (click)="setRange('yesterday')" [class]="currentRange === 'yesterday' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'bg-slate-100 text-slate-600 border border-slate-200'" class="px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all tap-effect">Hier</button>
+          <button (click)="setRange('week')" [class]="currentRange === 'week' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'bg-slate-100 text-slate-600 border border-slate-200'" class="px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all tap-effect">7j</button>
+          
+          <div class="relative ml-auto shrink-0">
+             <ion-datetime-button datetime="datetime" class="scale-90 origin-right"></ion-datetime-button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="px-4 py-3 shrink-0 z-10 grid grid-cols-2 gap-4 bg-slate-50/50">
+        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-col">
+          <p class="text-[10px] uppercase font-bold text-slate-400">Chiffre d'Affaires</p>
+          <p class="text-lg font-extrabold text-indigo-600"><ng-container *ngIf="stats$ | async as stats">{{ stats.totalRevenue | currency:'EUR':'symbol':'1.0-0' }}</ng-container></p>
+        </div>
+        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-col">
+          <p class="text-[10px] uppercase font-bold text-slate-400">Nb Ventes</p>
+          <p class="text-lg font-extrabold text-emerald-600"><ng-container *ngIf="stats$ | async as stats">{{ stats.count }}</ng-container></p>
+        </div>
+    </div>
+
+    <div class="flex-1 overflow-y-auto px-4 pb-safe space-y-3 bg-slate-50">
+      <ng-container *ngIf="sales$ | async as sales; else loading">
+        
+        <div *ngIf="sales.length === 0" class="flex flex-col items-center justify-center h-48 text-slate-400 gap-2">
+          <ion-icon name="receipt-outline" class="text-4xl opacity-50"></ion-icon>
+          <p class="font-medium text-sm">Aucune vente trouvée</p>
+        </div>
+
+        <div *ngFor="let sale of sales" (click)="openReceipt(sale)" class="bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex items-center justify-between active:scale-98 transition-transform cursor-pointer hover:border-indigo-100">
+          <div class="flex items-center gap-3">
+            
+            <div class="h-10 w-10 rounded-full flex items-center justify-center font-bold text-xs shadow-sm shrink-0" 
+                 [ngClass]="sale.paymentMethod === 'CARTE' ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600'">
+              <ion-icon [name]="sale.paymentMethod === 'CARTE' ? 'card-outline' : 'cash-outline'" class="text-lg"></ion-icon>
+            </div>
+            
+            <div class="flex flex-col">
+              <p class="font-bold text-slate-800 text-sm leading-tight">
+                {{ sale.date?.seconds * 1000 | date:'HH:mm' }} 
+                <span class="text-slate-400 font-normal text-xs ml-1">• {{ sale.itemCount }} art.</span>
+              </p>
+              
+              <div class="flex items-center gap-2 mt-1">
+                <div class="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-slate-100 border border-slate-200">
+                   <ion-icon name="person-outline" class="text-[10px] text-slate-500"></ion-icon>
+                   <span class="text-[10px] font-bold uppercase tracking-wide text-slate-600 max-w-[80px] truncate">
+                     {{ sale.staffName || 'Comptoir' }}
+                   </span>
+                </div>
+                <span class="text-[9px] text-slate-300 font-mono">#{{ sale.id | slice:0:4 }}</span>
+              </div>
+            </div>
+
+          </div>
+          
+          <span class="font-extrabold text-slate-800 text-base">{{ sale.total | currency:'EUR':'symbol':'1.2-2' }}</span>
+        </div>
+      </ng-container>
+      
+      <ng-template #loading>
+        <div class="text-center py-10 text-slate-400">Chargement...</div>
+      </ng-template>
+    </div>
+
+  </div>
+
+  <ion-modal [keepContentsMounted]="true">
+    <ng-template>
+      <ion-datetime id="datetime" presentation="date" (ionChange)="onDateChange($event)"></ion-datetime>
+    </ng-template>
+  </ion-modal>
+
+</ion-content>

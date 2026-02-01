@@ -1,0 +1,226 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Police moderne */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --ion-font-family: 'Inter', sans-serif;
+  --ion-background-color: #f8fafc; /* Slate 50 - Très doux */
+  --ion-text-color: #0f172a;       /* Slate 900 - Très lisible */
+}
+
+/* Reset Ionic pour laisser la main à Tailwind */
+ion-content {
+  --background: #f8fafc;
+}
+
+ion-item {
+  --background: transparent;
+  --border-width: 0;
+  --inner-padding-end: 0;
+  --padding-start: 0;
+}
+
+/* Utilitaires custom */
+.no-scroll {
+  --overflow: hidden;
+}
+
+/* Effet de clic subtil */
+.tap-effect:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+  transition: transform 0.1s;
+}
+
+/* Scrollbar fine pour desktop */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+/* --- STYLE CUSTOM POUR LE MENU STAFF --- */
+.staff-popover-class {
+  --width: 220px;
+  --box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  
+  // Le conteneur du popover
+  .popover-content {
+    border-radius: 16px !important; // Coins très arrondis
+    border: 1px solid #f1f5f9; // Slate-100
+  }
+
+  // La liste des items
+  ion-list {
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+    background: white;
+  }
+
+  // Chaque item (option)
+  ion-item {
+    --inner-border-width: 0; // Pas de ligne séparatrice
+    --background: transparent;
+    --min-height: 44px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #64748b; // Slate-500 par défaut
+    
+    // Animation au survol
+    &:hover {
+      --background: #f8fafc; // Slate-50
+      cursor: pointer;
+    }
+  }
+
+  // L'élément radio interne
+  ion-radio {
+    width: 100%;
+    
+    // CACHER LE ROND DU RADIO (Pour faire style "Menu")
+    &::part(container) {
+      display: none;
+    }
+    
+    // Alignement du texte
+    &::part(label) {
+      margin-inline-start: 0;
+      padding: 8px 16px;
+    }
+  }
+
+  // QUAND C'EST SÉLECTIONNÉ
+  .item-radio-checked {
+    --background: #eef2ff !important; // Indigo-50
+    
+    ion-radio {
+      color: #4f46e5 !important; // Indigo-600
+      font-weight: 700 !important;
+    }
+    
+    // Ajouter une petite barre bleue à gauche pour marquer la sélection
+    position: relative;
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 10%;
+      bottom: 10%;
+      width: 3px;
+      background-color: #4f46e5;
+      border-radius: 0 4px 4px 0;
+    }
+  }
+}
+
+/* --- MENU STAFF MODERNE (Tailwind Style) --- */
+ion-popover.modern-staff-popover {
+  --width: 200px; /* Largeur fixe propre */
+  --offset-y: 8px; /* Décalage vers le bas pour ne pas coller au bouton */
+  
+  /* Ombre portée douce type Tailwind shadow-xl */
+  --box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  /* Arrondi du conteneur global */
+  ::part(content) {
+    border-radius: 16px;
+    border: 1px solid #f1f5f9; /* Slate-100 */
+    background: white;
+  }
+  
+  /* Liste Interne */
+  ion-list {
+    background: transparent;
+    padding: 6px; /* Petit padding interne pour que les items ne touchent pas les bords */
+  }
+
+  /* Items (Lignes) */
+  ion-item {
+    --background: transparent;
+    --background-hover: #f8fafc; /* Slate-50 */
+    --background-activated: #f1f5f9;
+    --color: #475569; /* Slate-600 */
+    --min-height: 40px;
+    --padding-start: 12px;
+    --padding-end: 12px;
+    --inner-padding-end: 0;
+    --inner-border-width: 0; /* Pas de lignes entre les items */
+    
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 8px; /* Items arrondis */
+    margin-bottom: 2px;
+    cursor: pointer;
+    
+    /* Animation douce */
+    transition: background-color 0.2s ease, color 0.2s ease;
+
+    &:hover {
+      --background: #f8fafc;
+      color: #1e293b; /* Slate-800 */
+    }
+  }
+
+  /* CACHER LE ROND RADIO MOCHE */
+  ion-radio {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    
+    /* Masquer le conteneur du cercle/check */
+    &::part(container) {
+      display: none; 
+    }
+    
+    /* Ajuster le label */
+    &::part(label) {
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  /* ETAT SÉLECTIONNÉ */
+  .item-radio-checked {
+    --background: #eff6ff; /* Blue-50 (ou Indigo-50) */
+    --color: #4f46e5;     /* Indigo-600 */
+    font-weight: 700;
+    
+    ion-radio {
+      color: #4f46e5;
+    }
+
+    /* Petite icône Check à droite (Optionnel, ajoute un check CSS pur) */
+    &::after {
+      content: '✓';
+      position: absolute;
+      right: 12px;
+      font-size: 14px;
+      color: #4f46e5;
+      font-weight: bold;
+    }
+  }
+}
+
+/* FORCER LE POSITIONNEMENT DU POPOVER STAFF */
+ion-popover.modern-staff-popover {
+  /* On surcharge les variables de positionnement */
+  --offset-y: 10px !important; /* Espace sous le bouton */
+  --width: 220px !important;   /* Largeur fixe */
+  
+  /* S'assurer que le contenu ne dépasse pas */
+  &::part(content) {
+    margin-left: 0; 
+    transform-origin: top left;
+  }
+}

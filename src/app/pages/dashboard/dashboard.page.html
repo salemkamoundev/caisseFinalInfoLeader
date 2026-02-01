@@ -1,0 +1,112 @@
+<ion-content [fullscreen]="true" class="bg-slate-50">
+  <div class="flex flex-col min-h-screen pb-safe">
+    
+    <div class="bg-white px-8 pt-12 pb-10 rounded-b-[2.5rem] shadow-sm z-10 relative">
+      <div class="flex justify-between items-start">
+        <div>
+          <p class="text-slate-400 font-medium text-sm uppercase tracking-wider mb-1">Tableau de bord</p>
+          <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">Vue d'ensemble</h1>
+        </div>
+        
+        <ion-menu-button class="h-12 w-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-600 shadow-sm border border-slate-100 tap-effect hover:bg-slate-100 transition-colors focus:outline-none">
+          <ion-icon name="grid-outline" class="text-xl"></ion-icon>
+        </ion-menu-button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 mt-8">
+        <div routerLink="/history" class="bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-3xl p-5 text-white shadow-lg shadow-indigo-200 relative overflow-hidden group tap-effect cursor-pointer transition-transform hover:scale-[1.02]">
+          <div class="absolute right-0 top-0 opacity-10 transform translate-x-1/3 -translate-y-1/3">
+            <ion-icon name="wallet-outline" style="font-size: 8rem;"></ion-icon>
+          </div>
+          <div class="relative z-10">
+            <div class="flex items-center gap-2 mb-2 text-indigo-100">
+              <div class="bg-white/20 p-1.5 rounded-lg backdrop-blur-sm">
+                <ion-icon name="wallet-outline"></ion-icon>
+              </div>
+              <span class="text-xs font-bold uppercase tracking-wide">Recettes</span>
+            </div>
+            <div class="text-2xl font-bold tracking-tight">
+              <ng-container *ngIf="totalRevenue$ | async as total; else loadRev">{{ total | currency:'EUR':'symbol':'1.0-0' }}</ng-container>
+              <ng-template #loadRev>...</ng-template>
+            </div>
+          </div>
+        </div>
+
+        <div routerLink="/history" class="bg-white rounded-3xl p-5 text-slate-800 border border-slate-100 shadow-sm relative overflow-hidden tap-effect cursor-pointer transition-transform hover:scale-[1.02]">
+          <div class="flex items-center gap-2 mb-2 text-emerald-600">
+            <div class="bg-emerald-50 p-1.5 rounded-lg">
+              <ion-icon name="trending-up-outline"></ion-icon>
+            </div>
+            <span class="text-xs font-bold uppercase tracking-wide text-slate-400">Ventes</span>
+          </div>
+          <div class="text-2xl font-bold tracking-tight">
+            <ng-container *ngIf="totalCount$ | async as count; else loadCount">{{ count }}</ng-container>
+            <ng-template #loadCount>0</ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="px-6 mt-6">
+      <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="font-bold text-slate-700 text-sm">Activité 7 derniers jours</h3>
+          <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg">CA (€)</span>
+        </div>
+        <div class="relative h-48 w-full">
+          <canvas id="salesChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="px-6 mt-6 grid grid-cols-2 gap-5">
+      <button routerLink="/caisse" class="bg-white h-32 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center justify-center gap-3 tap-effect hover:border-indigo-200 transition-colors active:scale-95">
+        <div class="h-12 w-12 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600 text-xl">
+          <ion-icon name="calculator-outline"></ion-icon>
+        </div>
+        <span class="font-bold text-slate-700 text-sm">Caisse</span>
+      </button>
+
+      <button routerLink="/stocks" class="bg-white h-32 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center justify-center gap-3 tap-effect hover:border-emerald-200 transition-colors active:scale-95">
+        <div class="h-12 w-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 text-xl">
+          <ion-icon name="cube-outline"></ion-icon>
+        </div>
+        <span class="font-bold text-slate-700 text-sm">Stocks</span>
+      </button>
+      
+      <button routerLink="/staff" class="bg-white h-32 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center justify-center gap-3 tap-effect hover:border-amber-200 transition-colors active:scale-95">
+        <div class="h-12 w-12 bg-amber-50 rounded-full flex items-center justify-center text-amber-600 text-xl">
+          <ion-icon name="people-outline"></ion-icon>
+        </div>
+        <span class="font-bold text-slate-700 text-sm">Équipe</span>
+      </button>
+
+      <button routerLink="/history" class="bg-white h-32 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center justify-center gap-3 tap-effect hover:border-blue-200 transition-colors active:scale-95">
+        <div class="h-12 w-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 text-xl">
+          <ion-icon name="time-outline"></ion-icon>
+        </div>
+        <span class="font-bold text-slate-700 text-sm">Historique</span>
+      </button>
+    </div>
+
+    <div class="px-6 mt-auto pt-8 pb-4">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+           <div class="h-10 w-10 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center font-bold border border-indigo-100">
+             <ion-icon name="shield-checkmark-outline" class="text-lg"></ion-icon>
+           </div>
+           <div class="flex flex-col">
+             <h3 class="font-bold text-slate-800 text-sm">Mode Admin</h3>
+             <p class="text-[10px] text-slate-400 font-mono truncate max-w-[120px]">{{ currentUserEmail }}</p>
+           </div>
+        </div>
+        
+        <button (click)="logout()" class="h-10 px-4 bg-red-50 text-red-600 rounded-xl text-xs font-bold border border-red-100 tap-effect flex items-center gap-2 transition-colors hover:bg-red-100">
+          <ion-icon name="log-out-outline" class="text-base"></ion-icon>
+          Sortir
+        </button>
+      </div>
+    </div>
+
+  </div>
+</ion-content>

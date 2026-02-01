@@ -1,0 +1,86 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ isEditMode ? 'Modifier Produit' : 'Nouveau Produit' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cancel()">
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  
+  <div class="flex justify-center mb-6">
+    <div (click)="selectPhoto()" 
+         class="relative h-32 w-32 rounded-2xl bg-slate-100 border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden tap-effect active:scale-95 transition-transform cursor-pointer">
+      
+      <img *ngIf="product.imageUrl" [src]="product.imageUrl" class="h-full w-full object-cover" />
+      
+      <div *ngIf="!product.imageUrl && !isUploading" class="flex flex-col items-center text-slate-400">
+        <ion-icon name="camera-outline" class="text-3xl"></ion-icon>
+        <span class="text-xs font-bold mt-1">Ajouter photo</span>
+      </div>
+
+      <div *ngIf="isUploading" class="absolute inset-0 bg-white/80 flex items-center justify-center">
+        <ion-spinner color="primary"></ion-spinner>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-4">
+    
+    <div class="bg-white rounded-xl border border-slate-200 px-4 py-1">
+      <ion-item lines="none" class="--padding-start-0">
+        <ion-label position="stacked" class="text-xs font-bold text-slate-400 uppercase">Nom du produit</ion-label>
+        <ion-input [(ngModel)]="product.name" placeholder="Ex: Café" type="text" class="font-bold text-slate-800"></ion-input>
+      </ion-item>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div class="bg-white rounded-xl border border-slate-200 px-4 py-1">
+        <ion-item lines="none">
+          <ion-label position="stacked" class="text-xs font-bold text-slate-400 uppercase">Prix (€)</ion-label>
+          <ion-input [(ngModel)]="product.price" type="number" placeholder="0.00" class="font-bold text-slate-800"></ion-input>
+        </ion-item>
+      </div>
+      
+      <div class="bg-white rounded-xl border border-slate-200 px-4 py-1">
+        <ion-item lines="none">
+          <ion-label position="stacked" class="text-xs font-bold text-slate-400 uppercase">Stock</ion-label>
+          <ion-input [(ngModel)]="product.stock" type="number" placeholder="0" class="font-bold text-slate-800"></ion-input>
+        </ion-item>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 px-4 py-1">
+      <ion-item lines="none">
+        <ion-icon slot="start" name="grid-outline" class="text-slate-400 text-sm mt-3"></ion-icon>
+        <ion-label position="stacked" class="text-xs font-bold text-slate-400 uppercase">Catégorie</ion-label>
+        <ion-select [(ngModel)]="product.category" interface="popover" class="font-bold text-slate-800">
+          <ion-select-option value="Boissons">Boissons</ion-select-option>
+          <ion-select-option value="Snack">Snack</ion-select-option>
+          <ion-select-option value="Viennoiserie">Viennoiserie</ion-select-option>
+          <ion-select-option value="Divers">Divers</ion-select-option>
+        </ion-select>
+      </ion-item>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 px-4 py-1">
+      <ion-item lines="none">
+        <ion-icon slot="start" name="barcode-outline" class="text-slate-400 text-sm mt-3"></ion-icon>
+        <ion-label position="stacked" class="text-xs font-bold text-slate-400 uppercase">Code-barres</ion-label>
+        <ion-input [(ngModel)]="product.barcode" type="text" placeholder="Scan..." class="font-mono text-sm text-slate-600"></ion-input>
+      </ion-item>
+    </div>
+
+  </div>
+
+  <div class="mt-8">
+    <ion-button (click)="confirm()" expand="block" class="h-12 font-bold" shape="round">
+      <ion-icon slot="start" name="save-outline"></ion-icon>
+      {{ isEditMode ? 'Enregistrer les modifications' : 'Créer le produit' }}
+    </ion-button>
+  </div>
+
+</ion-content>

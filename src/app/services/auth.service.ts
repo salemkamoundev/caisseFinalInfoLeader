@@ -1,7 +1,7 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, NgZone, inject } from '@angular/core';
 import { Auth, signInWithEmailAndPassword, signOut, authState, User } from '@angular/fire/auth';
-import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,30 +9,43 @@ import { Router } from '@angular/router';
 export class AuthService {
   private auth: Auth = inject(Auth);
   private router: Router = inject(Router);
+  private ngZone: NgZone = inject(NgZone);
 
-  // Observable de l'état utilisateur (Connecté ou pas)
+  // Observable de l'utilisateur courant
   user$: Observable<User | null> = authState(this.auth);
 
   constructor() {}
 
-  // Connexion
+  // --- LOGIN ---
   async login(email: string, pass: string) {
     try {
       const credential = await signInWithEmailAndPassword(this.auth, email, pass);
+      
+      // Force la redirection dans la zone Angular
+      this.ngZone.run(() => {
+        this.router.navigate(['/dashboard'], { replaceUrl: true });
+      });
+
       return credential.user;
-    } catch (e: any) {
-      console.error(e);
+    } catch (e) {
+      console.error('Erreur Login:', e);
       throw e;
     }
   }
 
-  // Déconnexion
+  // --- LOGOUT ---
   async logout() {
-    await signOut(this.auth);
-    this.router.navigate(['/login']);
+    try {
+      await signOut(this.auth);
+      this.ngZone.run(() => {
+        this.router.navigate(['/login'], { replaceUrl: true });
+      });
+    } catch (e) {
+      console.error('Erreur Logout:', e);
+    }
   }
 
-  // Vérifier si connecté (Promise) pour les Guards
+  // --- UTILITAIRE GUARD ---
   isLoggedIn(): Promise<boolean> {
     return new Promise((resolve) => {
       const unsubscribe = this.auth.onAuthStateChanged((user) => {
@@ -41,9 +54,9 @@ export class AuthService {
       });
     });
   }
-  
-  // Récupérer l'email actuel
-  getCurrentUserEmail() {
+
+  // --- MÉTHODE MANQUANTE AJOUTÉE ICI ---
+  getCurrentUserEmail(): string | null | undefined {
     return this.auth.currentUser?.email;
   }
 }

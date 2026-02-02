@@ -1,5 +1,8 @@
 include ':app'
 include ':capacitor-cordova-android-plugins'
+include ':capacitor-usb-serial'
+project(':capacitor-usb-serial').projectDir = new File('../node_modules/capacitor-usb-serial/android')
+
 project(':capacitor-cordova-android-plugins').projectDir = new File('./capacitor-cordova-android-plugins/')
 
 apply from: 'capacitor.settings.gradle'

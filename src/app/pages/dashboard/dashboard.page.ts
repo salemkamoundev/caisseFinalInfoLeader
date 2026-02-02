@@ -1,3 +1,4 @@
+import { NgZone } from '@angular/core'; // 1. Importe NgZone
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -12,6 +13,8 @@ import { StatsService } from 'src/app/services/stats.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { Observable, map } from 'rxjs';
 import { Chart, registerables } from 'chart.js';
+import { IonicModule } from '@ionic/angular';
+import { FormsModule } from '@angular/forms';
 
 Chart.register(...registerables);
 
@@ -20,7 +23,10 @@ Chart.register(...registerables);
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
   standalone: true,
-  imports: [CommonModule, RouterLink, IonContent, IonIcon, IonMenuButton]
+  imports: [
+    IonicModule, CommonModule, FormsModule,
+    
+    RouterLink]
 })
 export class DashboardPage implements OnInit, AfterViewInit {
 
@@ -32,6 +38,7 @@ export class DashboardPage implements OnInit, AfterViewInit {
   currentUserEmail: string | null | undefined = '';
 
   constructor(
+    private ngZone: NgZone, // 2. Injecte NgZone
     private statsService: StatsService,
     private authService: AuthService,
     private alertCtrl: AlertController

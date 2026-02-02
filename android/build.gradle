@@ -6,6 +6,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
+        
         // Gradle Plugin (Version Stable)
         classpath 'com.android.tools.build:gradle:8.7.2'
         

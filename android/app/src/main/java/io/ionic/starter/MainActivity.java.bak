@@ -1,0 +1,8 @@
+package infoleader.caisse; // Gardez votre package actuel
+
+import android.os.Bundle;
+import com.getcapacitor.BridgeActivity;
+
+public class MainActivity extends BridgeActivity {
+    // On ne met rien ici, Capacitor 3+ enregistre les plugins automatiquement
+}

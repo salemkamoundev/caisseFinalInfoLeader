@@ -4,13 +4,12 @@ const config: CapacitorConfig = {
   appId: 'infoleader.caisse',
   appName: 'IonicCaisse',
   webDir: 'www',
- /*
   server: {
-    // ⚠️ Mettez VOTRE IP locale ici (ex: 192.168.1.15)
-    url: 'http://192.168.1.24:8100', 
-    cleartext: true
+    // 👇 TRÈS IMPORTANT pour le Live Reload
+    androidScheme: 'http',
+    cleartext: true,
+    allowNavigation: ['*']
   }
-  */
 };
 
 export default config;

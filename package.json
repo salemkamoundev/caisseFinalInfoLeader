@@ -38,6 +38,7 @@
     "@zxing/browser": "^0.1.5",
     "@zxing/library": "^0.21.3",
     "@zxing/ngx-scanner": "^21.0.0",
+    "capacitor-usb-serial": "^1.0.3",
     "chart.js": "^4.5.1",
     "cordova-plugin-printer": "^0.8.0",
     "firebase": "^11.10.0",

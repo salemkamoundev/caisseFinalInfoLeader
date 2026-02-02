@@ -52,3 +52,15 @@
     background-color: white !important;
   }
 }
+// Force l'opacité sur l'application pour éviter l'effet de transparence
+ion-content {
+  --background: #ffffff !important;
+  --opacity: 1 !important;
+  opacity: 1 !important;
+}
+
+// Assurez-vous que le conteneur de login est bien blanc
+.login-container {
+  background: white !important;
+  z-index: 999;
+}

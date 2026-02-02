@@ -1,166 +1,142 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { IonicModule, ModalController, Platform } from '@ionic/angular'; // ✅ Correction : Import de IonicModule
-import { addIcons } from 'ionicons';
-import { printOutline, closeOutline, checkmarkCircle, barcodeOutline } from 'ionicons/icons';
-import { Sale } from 'src/app/models/sale.model';
-import { ConfigService } from 'src/app/services/config.service';
-import { StoreConfig } from 'src/app/models/config.model';
-import { Printer, PrintOptions } from '@awesome-cordova-plugins/printer/ngx';
+import { ModalController, IonicModule } from '@ionic/angular'; 
+import { CommonModule, DatePipe, DecimalPipe } from '@angular/common'; 
+import { Printer } from '@awesome-cordova-plugins/printer/ngx';
+import { UsbSerial } from 'capacitor-usb-serial';
+
 
 @Component({
   selector: 'app-receipt-modal',
   templateUrl: './receipt-modal.component.html',
   styleUrls: ['./receipt-modal.component.scss'],
-  standalone: true,
-  // ✅ Correction : On utilise IonicModule au lieu de lister les composants individuellement
-  imports: [CommonModule, IonicModule], 
-  providers: [Printer]
+  standalone: true, 
+  imports: [IonicModule, CommonModule], 
+  providers: [Printer, DatePipe, DecimalPipe] 
 })
 export class ReceiptModalComponent implements OnInit {
+  @Input() sale: any;
+  @Input() config: any;
 
-  @Input() sale!: Sale;
-  config: StoreConfig | null = null;
+  constructor(private modalCtrl: ModalController, private printer: Printer) {}
 
-  constructor(
-    private modalCtrl: ModalController,
-    private configService: ConfigService,
-    private printer: Printer,
-    private platform: Platform
-  ) {
-    addIcons({ printOutline, closeOutline, checkmarkCircle, barcodeOutline });
+  ngOnInit() { }
+
+  close() { this.modalCtrl.dismiss(); }
+
+  parseDate(dateInput: any): Date {
+    if (!dateInput) return new Date();
+    return dateInput.seconds ? new Date(dateInput.seconds * 1000) : new Date(dateInput);
   }
 
-  ngOnInit() {
-    this.configService.getConfig().subscribe(c => this.config = c);
-  }
 
-  close() {
-    this.modalCtrl.dismiss();
-  }
 
-  // --- FONCTION ANTI-CRASH ---
-  parseDate(date: any): Date {
-    let validDate: Date;
-
-    if (!date) {
-      validDate = new Date();
-    } 
-    else if (typeof date === 'object' && 'seconds' in date) {
-      validDate = new Date(date.seconds * 1000);
-    } 
-    else {
-      validDate = new Date(date);
-    }
-
-    if (isNaN(validDate.getTime())) {
-      return new Date();
-    }
-
-    return validDate;
-  }
-
-  async printReceipt() {
-    // 1. Récupérer le contenu HTML brut
-    const content = document.getElementById('receipt-area')?.innerHTML;
-
-    if (!content) {
-      alert("Erreur: Ticket vide");
-      return;
-    }
-
-    // 2. Définir le CSS SPÉCIFIQUE pour l'impression (C'est ici que la magie opère)
-    // On force le centrage, la police, et la largeur à 100% pour le ticket
-    const styles = `
-      <style>
-        body { 
-          font-family: 'Courier New', Courier, monospace; 
-          width: 100%; 
-          margin: 0; 
-          padding: 0; 
-          background-color: white; 
-        }
-        .receipt-container, div {
-          width: 100%;
-          text-align: center; /* Centre tout par défaut */
-        }
-        
-        /* Force les titres en gras et gros */
-        h2, h3 { 
-          margin: 5px 0; 
-          text-align: center;
-        }
-
-        /* Force les produits en MAJUSCULES */
-        .product-name, strong {
-          text-transform: uppercase !important; 
-        }
-
-        /* Tableau des prix : alignement gauche/droite */
-        table { width: 100%; border-collapse: collapse; }
-        td { padding: 2px 0; }
-        .text-left { text-align: left; }
-        .text-right { text-align: right; }
-        
-        /* Ligne de séparation */
-        hr { border-top: 1px dashed black; }
-        
-        /* Image/Logo au centre */
-        img { 
-          display: block; 
-          margin: 0 auto; 
-          max-width: 150px; 
-        }
-      </style>
-    `;
-
-    // 3. Construire une page HTML complète avec les styles INCLUS
-    const fullHtml = `
-      <html>
-        <head>
-          ${styles}
-        </head>
-        <body>
-          <div class="receipt-container">
-            ${content}
-          </div>
-        </body>
-      </html>
-    `;
-
-    const options: PrintOptions = {
-      name: 'Ticket Caisse',
-      duplex: false,
-      orientation: 'portrait',
-      monochrome: true
-    };
-
-    if (!this.platform.is('cordova') && !this.platform.is('capacitor')) {
-      // Sur PC (Web), on ouvre une fenêtre spéciale pour imprimer proprement
-      const popupWin = window.open('', '_blank', 'width=400,height=600');
-      if (popupWin) {
-        popupWin.document.open();
-        popupWin.document.write(fullHtml);
-        popupWin.document.close();
-        popupWin.onload = () => {
-            popupWin.focus();
-            popupWin.print();
-            popupWin.close();
-        };
-      }
-      return;
-    }
+async printTestTicket() {
+    const usb = UsbSerial as any;
 
     try {
-      // Sur Android/Tablette : On envoie le HTML COMPLET avec le CSS
-      const printResult = this.printer.print(fullHtml, options);
-      if (printResult && typeof printResult.then === 'function') {
-        await printResult;
+      // 1. Détection de l'imprimante
+      const result = await usb.devices();
+      if (!result.devices || result.devices.length === 0) {
+        alert("Erreur : Imprimante USB non détectée.");
+        return;
       }
-    } catch (e) {
-      console.error('Erreur impression', e);
-      // Fallback
-      window.print();
+
+      const device = result.devices[0];
+
+      // 2. Connexion
+      await usb.connect({
+        deviceId: device.deviceId,
+        baudRate: 9600 // Standard pour la plupart des imprimantes de caisse
+      });
+
+      // 3. Préparation du contenu du ticket (basé sur ton image)
+      const encoder = new TextEncoder();
+      
+      // Commandes ESC/POS
+      const ESC = 0x1B;
+      const GS = 0x1D;
+      
+      const initPrinter = [ESC, 0x40];
+      const centerAlign = [ESC, 0x61, 0x01];
+      const leftAlign = [ESC, 0x61, 0x00];
+      const boldOn = [ESC, 0x45, 0x01];
+      const boldOff = [ESC, 0x45, 0x00];
+      const cutPaper = [GS, 0x56, 0x41, 0x03];
+
+      // Construction du texte
+      let content = "";
+      content += "MON COMMERCE\n";
+      content += "Tunisie\n";
+      content += "--------------------------------\n";
+      content += "1x Article 1\n";
+      content += "1x Article 2\n";
+      content += "1x Article 3\n";
+      content += "--------------------------------\n";
+      content += "TOTAL : 15.500 DT\n\n";
+      content += "Merci de votre visite !\n\n\n";
+
+      // Encodage en binaire
+      const textBytes = Array.from(encoder.encode(content));
+
+      // Fusion de toutes les commandes : Initialisation + Centrage + Texte + Coupe
+      const fullPayload = [
+        ...initPrinter, 
+        ...centerAlign, 
+        ...boldOn,
+        ...textBytes, 
+        ...cutPaper
+      ];
+
+      // 4. Envoi unique en Hexadécimal
+      await usb.write({
+        data: this.toHexString(new Uint8Array(fullPayload))
+      });
+
+      console.log("Impression lancée avec succès");
+
+    } catch (err) {
+      console.error("Échec de l'impression :", err);
+      alert("Erreur technique lors de l'impression.");
     }
+  }
+
+  toHexString(byteArray: Uint8Array): string {
+    return Array.from(byteArray, (byte) => {
+      return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+    }).join('');
+  }
+
+  printReceipt() {
+    const receiptElement = document.getElementById('receipt-area');
+    if (!receiptElement) return;
+
+    const content = receiptElement.innerHTML;
+    const style = "<style>body { font-family: 'Courier New', monospace; width: 100%; margin: 0; padding: 10px; } table { width: 100%; border-collapse: collapse; } .text-right { text-align: right; } hr { border-top: 1px dashed black; margin: 10px 0; }</style>";
+    const fullHtml = "<html><head>" + style + "</head><body>" + content + "</body></html>";
+
+    // Forcer l'impression système Android
+    this.printer.isAvailable().then(() => {
+      this.printer.print(fullHtml, { name: 'Ticket_Caisse', duplex: false });
+    }).catch(() => {
+      // Méthode IFRAME pour éviter la fenêtre vide Chrome
+      const iframe = document.createElement('iframe');
+      iframe.style.position = 'absolute';
+      iframe.style.top = '-9999px';
+      iframe.style.left = '-9999px';
+      document.body.appendChild(iframe);
+      
+      const doc = iframe.contentWindow?.document;
+      if (doc) {
+        doc.open();
+        doc.write(fullHtml);
+        doc.close();
+        
+        setTimeout(() => {
+          iframe.contentWindow?.focus();
+          iframe.contentWindow?.print();
+          setTimeout(() => document.body.removeChild(iframe), 2000);
+        }, 500);
+      }
+    });
   }
 }

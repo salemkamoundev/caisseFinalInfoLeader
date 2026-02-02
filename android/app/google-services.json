@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "454627276246",
+    "project_id": "caisseinfoleader",
+    "storage_bucket": "caisseinfoleader.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:454627276246:android:0bd47971f8a60e23e42077",
+        "android_client_info": {
+          "package_name": "infoleader.caisse"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDBUDz1vvP86GkuZae0hVRq1Ku76nQmTrI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

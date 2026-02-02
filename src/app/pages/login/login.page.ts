@@ -33,6 +33,8 @@ export class LoginPage implements OnInit {
 
   async onLogin(e: Event) {
     e.preventDefault();
+    console.log('🔴 BOUTON LOGIN CLIQUÉ'); // Log 1
+
     if (!this.email || !this.password) {
       this.errorMessage = 'Veuillez remplir tous les champs';
       return;
@@ -40,19 +42,23 @@ export class LoginPage implements OnInit {
 
     this.isLoading = true;
     this.errorMessage = '';
+    console.log('🔴 Tentative de connexion avec:', this.email); // Log 2
 
     try {
-      await this.authService.login(this.email, this.password);
-      // La redirection est gérée par le router ou ici
+      const user = await this.authService.login(this.email, this.password);
+      console.log('🟢 CONNEXION RÉUSSIE ! User:', user); // Log 3
       this.router.navigate(['/dashboard'], { replaceUrl: true });
     } catch (error: any) {
-      console.error(error);
+      console.error('🔴 ERREUR LOGIN:', error); // Log 4
+      console.log('🔴 CODE ERREUR:', error.code); // Log 5
+      console.log('🔴 MESSAGE ERREUR:', error.message); // Log 6
+      
       if (error.code === 'auth/invalid-credential') {
         this.errorMessage = 'Email ou mot de passe incorrect';
-      } else if (error.code === 'auth/too-many-requests') {
-        this.errorMessage = 'Trop de tentatives. Réessayez plus tard.';
+      } else if (error.code === 'auth/network-request-failed') {
+        this.errorMessage = 'Erreur réseau (Pas internet ?)';
       } else {
-        this.errorMessage = 'Erreur de connexion.';
+        this.errorMessage = 'Erreur: ' + error.message;
       }
     } finally {
       this.isLoading = false;

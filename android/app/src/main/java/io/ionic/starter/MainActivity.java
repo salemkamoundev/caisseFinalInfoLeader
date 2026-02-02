@@ -1,4 +1,4 @@
-package io.ionic.starter;
+package infoleader.caisse;
 
 import com.getcapacitor.BridgeActivity;
 
